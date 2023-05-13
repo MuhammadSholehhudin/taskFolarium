@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
+use App\Models\Jabatan;
+use App\Models\Kontrak;
+use App\Models\Pegawai;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -12,9 +14,15 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $datas = Employee::all();
+        $kontrakList = Kontrak::with('pegawai', 'jabatan')->get();
+        $pegawaiList = Pegawai::all();
+        $jabatanList = Jabatan::all();
+        $editMode = false;
         return view('index', compact(
-            'datas'
+            'kontrakList',
+            'pegawaiList',
+            'jabatanList',
+            'editMode'
         ));
     }
 
@@ -23,7 +31,7 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        $model = new Employee;
+        $model = new Kontrak();
         return view('employee', compact(
             'model'
         ));
@@ -34,11 +42,11 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        $model = new Employee;
-        $model->name = $request->name;
-        $model->birth_of_date = $request->dob;
-        $model->title = $request->title;
-        $model->id_employee = $request->nip;
+        $model = new Kontrak();
+        $model->id_pegawai = $request->nama_pegawai;
+        $model->id_jabatan = $request->jabatan;
+        $model->tgl_mulai_kontrak = $request->start_kontrak;
+        $model->tgl_berakhir_kontrak = $request->end_kontrak;
         $model->save();
 
         return redirect('employee')->with('added', 'Your new data has been added successfully !');
@@ -57,10 +65,17 @@ class EmployeeController extends Controller
      */
     public function edit(string $id)
     {
-        $data = Employee::find($id);
-        return view('edit', compact(
-            'data'
-        ));
+        $kontrak = Kontrak::find($id);
+        $pegawaiList = Pegawai::all();
+        $jabatanList = Jabatan::all();
+        $kontrakList = Kontrak::all();
+        return view('index', [
+            'editMode' => true,
+            'kontrak' => $kontrak,
+            'pegawaiList' => $pegawaiList,
+            'jabatanList' => $jabatanList,
+            'kontrakList' => $kontrakList
+        ]);
     }
 
     /**
@@ -68,11 +83,11 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $updatedData = Employee::find($id);
-        $updatedData->name = $request->name;
-        $updatedData->birth_of_date = $request->dob;
-        $updatedData->title = $request->title;
-        $updatedData->id_employee = $request->nip;
+        $updatedData = Kontrak::find($id);
+        $updatedData->id_pegawai = $request->nama;
+        $updatedData->id_jabatan = $request->jabatan;
+        $updatedData->tgl_mulai_kontrak = $request->start_kontrak;
+        $updatedData->tgl_berakhir_kontrak = $request->end_kontrak;
         $updatedData->save();
         return redirect('employee')->with('updated', 'Your data has been updated !');
     }
@@ -82,7 +97,7 @@ class EmployeeController extends Controller
      */
     public function destroy(string $id)
     {
-        $data = Employee::find($id);
+        $data = Kontrak::find($id);
         $data->delete();
         return redirect('employee')->with('deleted', 'Your data deleted successfully !');
     }

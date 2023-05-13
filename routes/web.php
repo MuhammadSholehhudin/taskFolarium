@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\KontrakController;
+use App\Http\Controllers\PegawaiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 //     return view('index');
 // });
 
-Route::resource('employee', EmployeeController::class);
+Route::resource('/employee', EmployeeController::class);
 //Route get => employee => index
 //Route get => employee/create => create
 //Route post => employee => store
@@ -26,4 +28,7 @@ Route::resource('employee', EmployeeController::class);
 //Route put => employee/{id} => update
 //Route delete => employee/{id} => delete
 //Route get => employee/{id}/edit => edit
+
+Route::get('/pegawai', [PegawaiController::class, 'indexView'])->name('pegawai.index');
+Route::get('/kontrak', [KontrakController::class, 'indexView'])->name('kontrak.index');
 
