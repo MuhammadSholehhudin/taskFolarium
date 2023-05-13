@@ -3,6 +3,7 @@ Sesuai dengan task :
     - tabel pegawai 
     - tabel kontrak 
     - tabel jabatan
+   Database di sertakan dengan nama data_karyawan.sql
 2. Aplikasi CRUD kontrak dengan : 
     - Validasi
     - Master Pegawai dan Jabatan yang berisi data dummy
