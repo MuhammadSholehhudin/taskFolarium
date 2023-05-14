@@ -2,16 +2,7 @@
 
 @section('content')
 
-<button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#myModal">Add New Data Kontrak</button>
-
-{{-- @if(session('added'))
-    <div class="alert alert-success">{{ session('added') }}</div>
-@elseif(session('updated'))
-<div class="alert alert-success">{{ session('updated') }}</div>
-@elseif(session('deleted'))
-<div class="alert alert-danger">{{ session('deleted') }}</div>
-@endif --}}
-
+<button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#myModal">Add New Data Pegawai</button>
 
 <table class="table table-striped">
     <thead>

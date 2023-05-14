@@ -3,10 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kontrak;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class KontrakController extends Controller
 {
+    public function indexView(){
+        try{
+            $client = new Client();
+            $response = $client->get('http://localhost:8000/api/kontrak');
+            $kontrak = json_decode($response->getBody(), true);
+            
+            return view('kontrak.index',[
+                'kontrak' => $kontrak
+            ]);
+        }catch(\Exception $e){
+            dd($e->getMessage());
+        }
+    }
     /**
      * Display a listing of the resource.
      */

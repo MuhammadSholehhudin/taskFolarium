@@ -70,7 +70,6 @@ class EmployeeController extends Controller
         $jabatanList = Jabatan::all();
         $kontrakList = Kontrak::all();
         return view('index', [
-            'editMode' => true,
             'kontrak' => $kontrak,
             'pegawaiList' => $pegawaiList,
             'jabatanList' => $jabatanList,

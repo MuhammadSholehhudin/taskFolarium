@@ -32,3 +32,4 @@ Route::resource('/employee', EmployeeController::class);
 Route::get('/pegawai', [PegawaiController::class, 'indexView'])->name('pegawai.index');
 Route::get('/kontrak', [KontrakController::class, 'indexView'])->name('kontrak.index');
 
+

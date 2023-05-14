@@ -2,7 +2,7 @@
 
 @section('content')
 
-<button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#myModal">Add New Data Kontrak</button>
+<button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#myModal" data-action="create">Add New Data Kontrak</button>
 
 @if(session('added'))
     <div class="alert alert-success">{{ session('added') }}</div>
@@ -16,7 +16,7 @@
         <tr>
             <th scope="col">No</th>
             <th scope="col">ID Pegawai</th>
-            <th scope="col">Name</th>
+            <th scope="col">Nama Pegawai</th>
             <th scope="col">Jabatan</th>
             <th scope="col">Tanggal Mulai Kontrak</th>
             <th scope="col">Tanggal Berakhir Kontrak</th>
@@ -39,7 +39,7 @@
                 {{-- <a href="{{ url('employee/'.$kontrak->id_pegawai.'/edit') }}" type="button" class="btn btn-secondary">Edit</a> --}}
               
                 <!-- Tombol untuk menampilkan modal dalam mode edit -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" >Edit</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" data-action="edit" data-id={{ $kontrak->id_pegawai }}>Edit</button>
                 
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure to delete this data ?')">Delete</button>
@@ -66,12 +66,13 @@
             </div>
 
             <div class="modal-body">
-                <form action="{{ url('employee') }}" method="POST">
+                {{-- <form action="{{ url('employee') }}" method="POST"> --}}
+                <form id="kontrakForm" method="POST">
                     @csrf
                     <div class="form-group">
                         <label for="nama_pegawai" class="col-form-label">Nama Pegawai : </label>
                         <select name="nama_pegawai" class="form-control" aria-label="Default select example" id="nama_pegawai" required>
-                            <option selected>Pilih Nama Pegawai...</option>
+                            <option value="default" selected>Pilih Nama Pegawai...</option>
                             @foreach($pegawaiList as $pegawai)
                             <option value="{{ $pegawai->id_pegawai }}">{{ $pegawai->nama_pegawai }}</option>
                             @endforeach
@@ -112,32 +113,79 @@
 <script>
     $(document).ready(function(){
         let action = '';
-        let id = '';
-        console.log(id)
+        let editId = '';
+       
 
         $('[data-action]').on('click', function(){
             action = $(this).data('action');
-            id = $(this).data('id');
+            editId = $(this).data('id');
 
-            if(action === 'edit'){
-                $.ajax({
-                    url: 'employee/' + id + '/edit',
-                    method: 'GET',
-                    success: function(response){
-                        $('select[name="nama_pegawai"]').val(response.nama_pegawai);
-                        $('select[name="jabatan"]').val(response.nama_jabatan);
-                        $('input[name="start_kontrak"]').val(response.tgl_mulai_kontrak);
-                        $('input[name="end_kontrak"]').val(response.tgl_berakhir_kontrak);
-                        console.log(response)
-                    }
-                });
-            } else {
-                $('select[name="nama"]').val('');
-                $('select[name="jabatan"]').val('');
-                $('input[name="start_kontrak"]').val('');
-                $('input[name="end_kontrak"]').val('');
+                if(action === 'create'){
+
+                    $('#kontrakForm').attr('action', '/employee');
+                    $('select[name="nama_pegawai"]').val("");
+                    $('select[name="jabatan"]').val("");
+                    $('input[name="start_kontrak"]').val("");
+                    $('input[name="end_kontrak"]').val("");
+
+                    $('select[name="nama_pegawai"] option:selected').prop('selected', false);
+                    $('select[name="jabatan"] option:selected').prop('selected', false);
+                    $('select[name="nama_pegawai"] option:first').prop('selected', true);
+                    $('select[name="jabatan"] option:first').prop('selected', true);
+            } else if (action === 'edit'){
+                $('#kontrakForm').attr('action', '/api/kontrak/' + editId);
+                populateFormWithEditData(editId);
             }
+
             $('#myModal').modal('show');
-        })
+        });
+
+
+        function populateFormWithEditData(id) {
+            // Lakukan AJAX request untuk mendapatkan data detail kontrak
+            $.ajax({
+                url: '/api/kontrak/' + id,
+                method: 'GET',
+                success: function(response) {
+                    // Mengisi nilai input form dengan data kontrak yang diterima
+                    $('select[name="nama_pegawai"]').val(response.id_pegawai);
+                    $('select[name="jabatan"]').val(response.id_jabatan);
+                    $('input[name="start_kontrak"]').val(response.tgl_mulai_kontrak);
+                    $('input[name="end_kontrak"]').val(response.tgl_berakhir_kontrak);
+                    console.log(response);
+
+                }
+            });
+        }
+
+        // Mengatur event handler untuk tombol Save
+        $('#saveButton').on('click', function() {
+            // Mengambil URL action dari form
+            let actionUrl = $('#kontrakForm').attr('action');
+
+            // Mengambil data form
+            let formData = $('#kontrakForm').serialize();
+
+            // Mengirim data melalui AJAX request
+            $.ajax({
+                url: actionUrl,
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                    // Menutup modal
+                    $('#myModal').modal('hide');
+
+                    // Mengalihkan ke halaman index atau melakukan refresh
+                    window.location.href = '/employee';
+                },
+                error: function(error) {
+                    // Menampilkan pesan error jika ada
+                    console.log(error.responseJSON);
+                }
+            });
+            let nilai = $( "input[name='nilai']" ).val();
+            // Gunakan nilai di sini atau lakukan operasi lain sesuai kebutuhan.
+        });
     });
+       
 </script>
