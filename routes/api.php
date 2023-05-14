@@ -23,4 +23,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResource('pegawai', PegawaiController::class);
 
 Route::apiResource('kontrak', KontrakController::class);
-Route::post('/kontrak/{id}', [KontrakController::class, 'update']);

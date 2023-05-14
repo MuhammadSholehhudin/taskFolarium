@@ -34,15 +34,13 @@
         <td>{{ $kontrak->tgl_mulai_kontrak }}</td>
         <td>{{ $kontrak->tgl_berakhir_kontrak }}</td>
         <td>
-            <form action="{{ url('employee/'.$kontrak->id_pegawai) }}" method="POST">
+            <form id="actionForm" action="{{ url('employee/'.$kontrak->id_kontrak) }}" method="POST">
                 @csrf
-                {{-- <a href="{{ url('employee/'.$kontrak->id_pegawai.'/edit') }}" type="button" class="btn btn-secondary">Edit</a> --}}
-              
-                <!-- Tombol untuk menampilkan modal dalam mode edit -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" data-action="edit" data-id={{ $kontrak->id_pegawai }}>Edit</button>
-                
+       
+                <button type="button" class="btn btn-primary" id="editButton" data-toggle="modal" data-target="#myModal" data-action="edit" data-id="{{ $kontrak->id_kontrak }}">Edit</button>
+           
                 @method('DELETE')
-                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure to delete this data ?')">Delete</button>
+                <button type="submit" class="btn btn-danger deleteButton" data-id="{{ $kontrak->id_kontrak }}">Delete</button>
             </form>
         </td>
       </tr>
@@ -51,24 +49,22 @@
   </table>
 @endsection
 
-
-
 {{-- Add/Edit Employee Modal --}}
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Add New Data Kontrak</h5>
+                <h5 class="modal-title" id="modalLabel"></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
 
             <div class="modal-body">
-                {{-- <form action="{{ url('employee') }}" method="POST"> --}}
                 <form id="kontrakForm" method="POST">
                     @csrf
+            
                     <div class="form-group">
                         <label for="nama_pegawai" class="col-form-label">Nama Pegawai : </label>
                         <select name="nama_pegawai" class="form-control" aria-label="Default select example" id="nama_pegawai" required>
@@ -100,7 +96,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary" id="saveButton">Save</button>
             </div>
         </form>
 
@@ -121,8 +117,10 @@
             editId = $(this).data('id');
 
                 if(action === 'create'){
-
+                    $('#modalLabel').text('Add New Data Kontrak');
                     $('#kontrakForm').attr('action', '/employee');
+                    $('#saveButton').text('Save');
+
                     $('select[name="nama_pegawai"]').val("");
                     $('select[name="jabatan"]').val("");
                     $('input[name="start_kontrak"]').val("");
@@ -133,11 +131,17 @@
                     $('select[name="nama_pegawai"] option:first').prop('selected', true);
                     $('select[name="jabatan"] option:first').prop('selected', true);
             } else if (action === 'edit'){
-                $('#kontrakForm').attr('action', '/api/kontrak/' + editId);
+                $('#kontrakForm').attr('action', '/employee/' + editId);
+                $('#kontrakForm').attr('method', 'PUT');
+                $('#modalLabel').text('Edit Data Kontrak');
+                $('#saveButton').text('Update');
                 populateFormWithEditData(editId);
+                // $('#saveButton').on('click', function(){
+                //     alert('priiiit');
+                // });
             }
 
-            $('#myModal').modal('show');
+            $('#myModal').modal('hide');
         });
 
 
@@ -152,40 +156,25 @@
                     $('select[name="jabatan"]').val(response.id_jabatan);
                     $('input[name="start_kontrak"]').val(response.tgl_mulai_kontrak);
                     $('input[name="end_kontrak"]').val(response.tgl_berakhir_kontrak);
-                    console.log(response);
-
                 }
             });
+        }     
+    
+});
+
+// Fungsi Delete
+$(document).ready(function() {
+    $('#actionForm .deleteButton').click(function(e) {
+        e.preventDefault();
+
+        var confirmation = confirm("Apakah Anda yakin ingin menghapus kontrak ini?");
+        
+        if (confirmation) {
+            $(this).closest('#actionForm').submit();
         }
-
-        // Mengatur event handler untuk tombol Save
-        $('#saveButton').on('click', function() {
-            // Mengambil URL action dari form
-            let actionUrl = $('#kontrakForm').attr('action');
-
-            // Mengambil data form
-            let formData = $('#kontrakForm').serialize();
-
-            // Mengirim data melalui AJAX request
-            $.ajax({
-                url: actionUrl,
-                method: 'POST',
-                data: formData,
-                success: function(response) {
-                    // Menutup modal
-                    $('#myModal').modal('hide');
-
-                    // Mengalihkan ke halaman index atau melakukan refresh
-                    window.location.href = '/employee';
-                },
-                error: function(error) {
-                    // Menampilkan pesan error jika ada
-                    console.log(error.responseJSON);
-                }
-            });
-            let nilai = $( "input[name='nilai']" ).val();
-            // Gunakan nilai di sini atau lakukan operasi lain sesuai kebutuhan.
-        });
     });
+});
+
        
+
 </script>

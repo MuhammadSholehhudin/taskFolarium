@@ -83,11 +83,13 @@ class EmployeeController extends Controller
     public function update(Request $request, string $id)
     {
         $updatedData = Kontrak::find($id);
-        $updatedData->id_pegawai = $request->nama;
-        $updatedData->id_jabatan = $request->jabatan;
+        $updatedData->id_pegawai = $request->id_pegawai;
+        $updatedData->id_jabatan = $request->id_jabatan;
         $updatedData->tgl_mulai_kontrak = $request->start_kontrak;
         $updatedData->tgl_berakhir_kontrak = $request->end_kontrak;
         $updatedData->save();
+
+        
         return redirect('employee')->with('updated', 'Your data has been updated !');
     }
 
