@@ -42,12 +42,16 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
+        
         $model = new Kontrak();
         $model->id_pegawai = $request->nama_pegawai;
         $model->id_jabatan = $request->jabatan;
         $model->tgl_mulai_kontrak = $request->start_kontrak;
         $model->tgl_berakhir_kontrak = $request->end_kontrak;
+    
         $model->save();
+
+
 
         return redirect('employee')->with('added', 'Your new data has been added successfully !');
     }
@@ -83,11 +87,11 @@ class EmployeeController extends Controller
     public function update(Request $request, string $id)
     {
         $updatedData = Kontrak::find($id);
-        $updatedData->id_pegawai = $request->id_pegawai;
-        $updatedData->id_jabatan = $request->id_jabatan;
+        $updatedData->id_pegawai = $request->nama_pegawai;
+        $updatedData->id_jabatan = $request->jabatan;
         $updatedData->tgl_mulai_kontrak = $request->start_kontrak;
         $updatedData->tgl_berakhir_kontrak = $request->end_kontrak;
-        $updatedData->save();
+        $updatedData->update();
 
         
         return redirect('employee')->with('updated', 'Your data has been updated !');

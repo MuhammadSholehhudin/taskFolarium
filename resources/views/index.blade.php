@@ -36,7 +36,8 @@
         <td>
             <form id="actionForm" action="{{ url('employee/'.$kontrak->id_kontrak) }}" method="POST">
                 @csrf
-       
+                
+                @method('PUT')
                 <button type="button" class="btn btn-primary" id="editButton" data-toggle="modal" data-target="#myModal" data-action="edit" data-id="{{ $kontrak->id_kontrak }}">Edit</button>
            
                 @method('DELETE')
@@ -113,8 +114,8 @@
        
 
         $('[data-action]').on('click', function(){
-            action = $(this).data('action');
-            editId = $(this).data('id');
+            let action = $(this).data('action');
+            let editId = $(this).data('id');
 
                 if(action === 'create'){
                     $('#modalLabel').text('Add New Data Kontrak');
@@ -131,18 +132,46 @@
                     $('select[name="nama_pegawai"] option:first').prop('selected', true);
                     $('select[name="jabatan"] option:first').prop('selected', true);
             } else if (action === 'edit'){
-                $('#kontrakForm').attr('action', '/employee/' + editId);
-                $('#kontrakForm').attr('method', 'PUT');
-                $('#modalLabel').text('Edit Data Kontrak');
-                $('#saveButton').text('Update');
-                populateFormWithEditData(editId);
-                // $('#saveButton').on('click', function(){
-                //     alert('priiiit');
-                // });
-            }
+                    $('#kontrakForm').attr('action', '/employee/' + editId);
+                    $('#kontrakForm').attr('method', 'POST');
+                    $('#modalLabel').text('Edit Data Kontrak');
+                    $('#saveButton').text('Update');
+                    populateFormWithEditData(editId);
+                }
 
-            $('#myModal').modal('hide');
+            $('#myModal').modal('show');
         });
+
+        $('#kontrakForm').submit(function(e) {
+                e.preventDefault();
+
+                var action = $('#saveButton').text() === 'Save' ? 'create' : 'edit';
+                var url = action === 'create' ? '/employee' : $('#kontrakForm').attr('action');
+                var method = action === 'create' ? 'POST' : 'PUT'; // Use POST method for method override
+
+                // Add CSRF token to the form data
+                var formData = $('#kontrakForm').serialize();
+                formData += '&_method=' + method; // Add method override
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    data: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token in headers
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        $('#myModal').modal('hide');
+                        location.reload();
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+
+
 
 
         function populateFormWithEditData(id) {
@@ -159,21 +188,19 @@
                 }
             });
         }     
-    
-});
-
-// Fungsi Delete
-$(document).ready(function() {
-    $('#actionForm .deleteButton').click(function(e) {
-        e.preventDefault();
-
-        var confirmation = confirm("Apakah Anda yakin ingin menghapus kontrak ini?");
+        // Fungsi Delete
+            $('.deleteButton').click(function(e) {
+                e.preventDefault();
         
-        if (confirmation) {
-            $(this).closest('#actionForm').submit();
-        }
-    });
+                var confirmation = confirm("Apakah Anda yakin ingin menghapus kontrak ini?");
+                
+                if (confirmation) {
+                    $(this).closest('#actionForm').submit();
+                }
+            });
 });
+
+
 
        
 
